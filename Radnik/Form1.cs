@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Radnik
@@ -19,22 +13,27 @@ namespace Radnik
 
         string original = null, kopija = null;
 
+        public BackgroundWorker Radnik { get => radnik; set => radnik = value; }
+        public FolderBrowserDialog Fbd { get => fbd; set => fbd = value; }
+        public OpenFileDialog Ofd { get => ofd; set => ofd = value; }
+        public string Original { get => original; set => original = value; }
+        public string Kopija { get => kopija; set => kopija = value; }
+
         public Form1()
         {
             InitializeComponent();
 
-            radnik.WorkerReportsProgress = true;
-            radnik.WorkerSupportsCancellation = true;
+            Radnik.WorkerReportsProgress = true;
+            Radnik.WorkerSupportsCancellation = true;
 
-            radnik.DoWork += new DoWorkEventHandler(radnik_DoWork);
-            radnik.ProgressChanged += new ProgressChangedEventHandler(radnik_ProgressChanged);
-            radnik.RunWorkerCompleted += new RunWorkerCompletedEventHandler(radnik_RunWorkerCompleted);
+            Radnik.DoWork += new DoWorkEventHandler(radnik_DoWork);
+            Radnik.ProgressChanged += new ProgressChangedEventHandler(radnik_ProgressChanged);
+            Radnik.RunWorkerCompleted += new RunWorkerCompletedEventHandler(radnik_RunWorkerCompleted);
         }
 
         private void Copy(string ulaznaputanja, string izlaznaputanja)
         {
             int bufferSize = 1024 * 1024;
-
 
             try
             {
@@ -48,16 +47,16 @@ namespace Radnik
                     while ((bytesRead = izlaznadatoteka.Read(bytes, 0, bufferSize)) > 0)
                     {
                         ulaznadatoteka.Write(bytes, 0, bytesRead);
-                        radnik.ReportProgress((int)(izlaznadatoteka.Position * 100 / izlaznadatoteka.Length));
+                        Radnik.ReportProgress((int)(izlaznadatoteka.Position * 100 / izlaznadatoteka.Length));
                     }
-
                     izlaznadatoteka.Close();
                     ulaznadatoteka.Close();
                 }
             }
+
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Pogreška {0}",e);
             }
         }
 
@@ -87,45 +86,45 @@ namespace Radnik
 
         private void radnik_DoWork(object sender, DoWorkEventArgs e)
         {
-            if ((radnik.CancellationPending == true))
+            if ((Radnik.CancellationPending == true))
             {
                 e.Cancel = true;
                 return;
             }
             else
             {
-                Copy(original, kopija + @"\" + Path.GetFileName(original));
+                Copy(Original, Kopija + @"\" + Path.GetFileName(Original));
             }
         }
 
         private void OdaberiFolder_Click(object sender, EventArgs e)
         {
-            if (fbd.ShowDialog() == DialogResult.OK)
+            if (Fbd.ShowDialog() == DialogResult.OK)
             {
-                kopija = fbd.SelectedPath;
-                textBox2.Text = kopija + @"\" + Path.GetFileName(original);
+                Kopija = Fbd.SelectedPath;
+                textBox2.Text = Kopija + @"\" + Path.GetFileName(Original);
             }
         }
 
         private void Kopiraj_Click(object sender, EventArgs e)
         {
-            if (radnik.IsBusy != true)
+            if (Radnik.IsBusy != true)
             {
-                radnik.RunWorkerAsync();
+                Radnik.RunWorkerAsync();
             }
         }
 
         private void Zaustavi_Click(object sender, EventArgs e)
         {
-            radnik.CancelAsync();
+            Radnik.CancelAsync();
         }
 
         private void OdaberiFile_Click(object sender, EventArgs e)
         {
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (Ofd.ShowDialog() == DialogResult.OK)
             {
-                original = ofd.FileName;
-                textBox1.Text = original;
+                Original = Ofd.FileName;
+                textBox1.Text = Original;
             }
         }
 

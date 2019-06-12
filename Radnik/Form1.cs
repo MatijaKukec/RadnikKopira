@@ -63,7 +63,7 @@ namespace Radnik
 
         private void radnik_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Tekst.Text = e.ProgressPercentage.ToString();
+            Tekst.Text = e.ProgressPercentage.ToString()+" %";
             progressBar1.Value = e.ProgressPercentage;
         }
 
